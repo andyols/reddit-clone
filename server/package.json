@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:watch": "tsc -w",
-    "dev:start": "nodemon dist/index.js",
+    "dev:start": "PORT=4000 nodemon dist/index.js",
     "start": "node dist/index.js"
   },
   "keywords": [],

@@ -3,7 +3,7 @@ import path from 'path'
 import { PROD } from './constants'
 import { Post } from './entities/Post'
 
-export default {
+const config = {
   migrations: {
     path: path.join(__dirname, './migrations'),
     pattern: /^[\w-]+\d+\.[tj]s$/
@@ -13,3 +13,5 @@ export default {
   type: 'postgresql',
   debug: !PROD
 } as Parameters<typeof MikroORM.init>[0] // black-magic ts casting
+
+export default config
