@@ -1,6 +1,7 @@
 import { MikroORM } from '@mikro-orm/core'
 import { ApolloServer } from 'apollo-server-express'
 import connectRedis from 'connect-redis'
+import cors from 'cors'
 import 'dotenv-safe/config'
 import express from 'express'
 import session from 'express-session'
@@ -31,6 +32,14 @@ const main = async () => {
   const RedisStore = connectRedis(session)
   const redisClient = redis.createClient()
 
+  // apply cors to all routes
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true
+    })
+  )
+
   // express-session setup
   app.use(
     session({
@@ -60,7 +69,7 @@ const main = async () => {
     }),
     context: ({ req, res }) => ({ em: orm.em, req, res })
   })
-  apolloServer.applyMiddleware({ app })
+  apolloServer.applyMiddleware({ app, cors: false })
 
   const port = process.env.PORT
   app.listen(port, () => {
