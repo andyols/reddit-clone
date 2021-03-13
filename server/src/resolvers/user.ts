@@ -6,6 +6,7 @@ import {
   InputType,
   Mutation,
   ObjectType,
+  Query,
   Resolver
 } from 'type-graphql'
 import { User } from '../entities/User'
@@ -42,11 +43,26 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { req, em }: MyContext) {
+    // get user id from session cookie
+    const id = req.session.userId
+
+    // not logged in
+    if (!id) {
+      return null
+    }
+
+    // return user data
+    const user = await em.findOne(User, { id })
+    return user
+  }
+
   // register a user
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UserOptions,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     // validate username
     if (options.username.length <= 2) {
@@ -95,6 +111,9 @@ export class UserResolver {
       }
     }
 
+    // persist user in session cookie
+    req.session.userId = user.id
+
     return { user }
   }
 
@@ -102,7 +121,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg('options') options: UserOptions,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     // check for user
     const user = await em.findOne(User, { username: options.username })
@@ -129,6 +148,9 @@ export class UserResolver {
         ]
       }
     }
+
+    // persist user in session cookie
+    req.session.userId = user.id
 
     return { user }
   }
