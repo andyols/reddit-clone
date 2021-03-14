@@ -5,6 +5,7 @@ import { createClient, dedupExchange, fetchExchange, Provider } from 'urql'
 import { Navbar } from '../components/Navbar'
 import {
   LoginMutation,
+  LogoutMutation,
   MeDocument,
   MeQuery,
   RegisterMutation
@@ -28,6 +29,23 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
+          register: (_result, args, cache, info) => {
+            betterUpdateQuery<RegisterMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              (result, query) => {
+                if (result.register.errors) {
+                  return query
+                } else {
+                  return {
+                    me: result.register.user
+                  }
+                }
+              }
+            )
+          },
+
           login: (_result, args, cache, info) => {
             betterUpdateQuery<LoginMutation, MeQuery>(
               cache,
@@ -45,20 +63,12 @@ const client = createClient({
             )
           },
 
-          register: (_result, args, cache, info) => {
-            betterUpdateQuery<RegisterMutation, MeQuery>(
+          logout: (_result, args, cache, info) => {
+            betterUpdateQuery<LogoutMutation, MeQuery>(
               cache,
               { query: MeDocument },
               _result,
-              (result, query) => {
-                if (result.register.errors) {
-                  return query
-                } else {
-                  return {
-                    me: result.register.user
-                  }
-                }
-              }
+              () => ({ me: null })
             )
           }
         }

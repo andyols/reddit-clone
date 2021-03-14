@@ -10,6 +10,7 @@ import {
   Query,
   Resolver
 } from 'type-graphql'
+import { _COOKIE_NAME_ } from '../constants'
 import { User } from '../entities/User'
 import { MyContext } from '../types'
 
@@ -161,5 +162,23 @@ export class UserResolver {
     req.session.userId = user.id
 
     return { user }
+  }
+
+  // logout the user
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    // clear session from redis server
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err)
+          resolve(false)
+        }
+
+        // clear the cookie
+        res.clearCookie(_COOKIE_NAME_)
+        resolve(true)
+      })
+    )
   }
 }
