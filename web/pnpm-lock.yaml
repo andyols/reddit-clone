@@ -4,6 +4,7 @@ dependencies:
   '@chakra-ui/theme-tools': 1.0.4_react@17.0.1
   '@emotion/react': 11.1.5_cad2d10d978acf29faaf5e3800be8bd7
   '@emotion/styled': 11.1.5_f824da79c928cfd3f66b2109c1e8bb58
+  '@urql/exchange-graphcache': 4.0.0_graphql@15.5.0
   formik: 2.2.6_react@17.0.1
   framer-motion: 3.10.3_react-dom@17.0.1+react@17.0.1
   graphql: 15.5.0
@@ -2128,6 +2129,16 @@ packages:
       graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
     resolution:
       integrity: sha512-Qj24CG8ullqZZsYmjrSH0JhH+nY7kj8GbVbA9si3KUjlYs75A/MBQU3i97j6oWyGldDBapyis2CfaQeXKbv8rA==
+  /@urql/exchange-graphcache/4.0.0_graphql@15.5.0:
+    dependencies:
+      '@urql/core': 2.0.0_graphql@15.5.0
+      graphql: 15.5.0
+      wonka: 4.0.15
+    dev: false
+    peerDependencies:
+      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+    resolution:
+      integrity: sha512-UuLyR2tuy28KFmcMzD0aU3hWEa62H8Yfo9rBVAaXPxvGUD8g0Bq3NXUGLBvXxKMZcodn7AjYeVBlfPCHth9awA==
   /agent-base/6.0.2:
     dependencies:
       debug: 4.3.1
@@ -6216,6 +6227,7 @@ specifiers:
   '@types/node': ^14.6.0
   '@types/react': ^16.9.46
   '@types/react-dom': ^16.9.8
+  '@urql/exchange-graphcache': ^4.0.0
   formik: ^2.2.6
   framer-motion: ^3.5.2
   graphql: ^15.5.0
