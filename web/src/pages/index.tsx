@@ -1,9 +1,26 @@
-import { Code, Text } from '@chakra-ui/react'
+import { Code, Spinner, Text } from '@chakra-ui/react'
+import { withUrqlClient } from 'next-urql'
+import { Navbar } from '../components/Navbar'
+import { usePostsQuery } from '../generated/graphql'
+import { createUrqlClient } from '../utils/createUrqlClient'
 
-const Index = () => (
-  <Text>
-    Hello, <Code>Next.js</Code> !
-  </Text>
-)
+const Index = () => {
+  const [{ data }] = usePostsQuery()
 
-export default Index
+  return (
+    <>
+      <Navbar />
+      <Text>
+        Hello, <Code>Next.js</Code> !
+      </Text>
+      <br />
+      {!data ? (
+        <Spinner />
+      ) : (
+        data.posts.map((p) => <Text key={p.id}>{p.title}</Text>)
+      )}
+    </>
+  )
+}
+
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index)
