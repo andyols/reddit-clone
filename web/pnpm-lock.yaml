@@ -7,6 +7,7 @@ dependencies:
   formik: 2.2.6_react@17.0.1
   framer-motion: 3.10.3_react-dom@17.0.1+react@17.0.1
   graphql: 15.5.0
+  graphql-tag: 2.11.0_graphql@15.5.0
   next: 10.0.8_673d10ab695550cf3e856d21663dfc3f
   react: 17.0.1
   react-dom: 17.0.1_react@17.0.1
@@ -15,7 +16,7 @@ devDependencies:
   '@graphql-codegen/cli': 1.21.2_graphql@15.5.0+typescript@4.0.5
   '@graphql-codegen/typescript': 1.21.1_graphql@15.5.0
   '@graphql-codegen/typescript-operations': 1.17.15_graphql@15.5.0
-  '@graphql-codegen/typescript-urql': 2.0.4_graphql@15.5.0
+  '@graphql-codegen/typescript-urql': 2.0.4_28a65ed17e5509be3f9314a464678e80
   '@types/node': 14.14.34
   '@types/react': 16.14.5
   '@types/react-dom': 16.9.11
@@ -1537,13 +1538,14 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
     resolution:
       integrity: sha512-HStWj3mUe+0ir2J0jqgjegrvcO1DIe2gzsoBBo9RHIYwyaxedUivxXvWY9XBfKpHv6sLa/ST1iYGeedrJELPtw==
-  /@graphql-codegen/typescript-urql/2.0.4_graphql@15.5.0:
+  /@graphql-codegen/typescript-urql/2.0.4_28a65ed17e5509be3f9314a464678e80:
     dependencies:
       '@graphql-codegen/plugin-helpers': 1.18.3_graphql@15.5.0
       '@graphql-codegen/visitor-plugin-common': 1.19.0_graphql@15.5.0
       auto-bind: 4.0.0
       change-case-all: 1.0.12
       graphql: 15.5.0
+      graphql-tag: 2.11.0_graphql@15.5.0
       tslib: 2.1.0
     dev: true
     peerDependencies:
@@ -3594,7 +3596,6 @@ packages:
   /graphql-tag/2.11.0_graphql@15.5.0:
     dependencies:
       graphql: 15.5.0
-    dev: true
     peerDependencies:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
     resolution:
@@ -6218,6 +6219,7 @@ specifiers:
   formik: ^2.2.6
   framer-motion: ^3.5.2
   graphql: ^15.5.0
+  graphql-tag: ^2.11.0
   next: latest
   react: ^17.0.1
   react-dom: ^17.0.1
