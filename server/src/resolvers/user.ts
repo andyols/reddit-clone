@@ -1,4 +1,3 @@
-import { EntityManager } from '@mikro-orm/postgresql'
 import argon2 from 'argon2'
 import {
   Arg,
@@ -43,7 +42,7 @@ export class UserResolver {
   async changePassword(
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
-    @Ctx() { redis, em, req }: MyContext
+    @Ctx() { redis, req }: MyContext
   ): Promise<UserResponse> {
     // validate password
     if (newPassword.length <= 2) {
@@ -73,7 +72,8 @@ export class UserResolver {
       }
     }
 
-    const user = await em.findOne(User, { id: parseInt(userId) })
+    const userIdNum = parseInt(userId)
+    const user = await User.findOne(userIdNum)
 
     if (!user) {
       // if user associated with this token was deleted
@@ -87,8 +87,10 @@ export class UserResolver {
       }
     }
 
-    user.password = await argon2.hash(newPassword)
-    await em.persistAndFlush(user)
+    await User.update(
+      { id: userIdNum },
+      { password: await argon2.hash(newPassword) }
+    )
 
     // clear token from redis
     await redis.del(key)
@@ -102,9 +104,9 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg('email') email: string,
-    @Ctx() { em, redis }: MyContext
+    @Ctx() { redis }: MyContext
   ) {
-    const user = await em.findOne(User, { email })
+    const user = await User.findOne({ where: { email } })
 
     if (!user) {
       // did not find email in db
@@ -132,7 +134,7 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req, em }: MyContext) {
+  me(@Ctx() { req }: MyContext) {
     // get user id from session cookie
     const id = req.session.userId
 
@@ -141,16 +143,15 @@ export class UserResolver {
       return null
     }
 
-    // return user data
-    const user = await em.findOne(User, { id })
-    return user
+    // return user data as a promise
+    return User.findOne(id)
   }
 
   // register a user
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UserOptions,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options)
 
@@ -163,18 +164,14 @@ export class UserResolver {
 
     let user
     try {
-      const result = await (em as EntityManager)
-        .createQueryBuilder(User)
-        .getKnexQuery()
-        .insert({
-          email: options.email,
-          username: options.username,
-          password: hashedPassword,
-          created_at: new Date(),
-          updated_at: new Date()
-        })
-        .returning('*')
-      user = result[0]
+      user = await User.create({
+        email: options.email,
+        username: options.username,
+        password: hashedPassword
+      }).save()
+
+      // persist user in session cookie
+      req.session.userId = user.id
     } catch (err) {
       if (err.code === '23505') {
         // duplicate username
@@ -189,9 +186,6 @@ export class UserResolver {
       }
     }
 
-    // persist user in session cookie
-    req.session.userId = user.id
-
     return { user }
   }
 
@@ -200,14 +194,13 @@ export class UserResolver {
   async login(
     @Arg('usernameOrEmail') usernameOrEmail: string,
     @Arg('password') password: string,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     // check for user
-    const user = await em.findOne(
-      User,
+    const user = await User.findOne(
       usernameOrEmail.includes('@')
-        ? { email: usernameOrEmail }
-        : { username: usernameOrEmail }
+        ? { where: { email: usernameOrEmail } }
+        : { where: { username: usernameOrEmail } }
     )
     if (!user) {
       return {

@@ -1,4 +1,3 @@
-import { MikroORM } from '@mikro-orm/core'
 import { ApolloServer } from 'apollo-server-express'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
@@ -8,22 +7,25 @@ import session from 'express-session'
 import Redis from 'ioredis'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
+import { createConnection } from 'typeorm'
 import { _COOKIE_NAME_, _PROD_ } from './constants'
-import mikroConfig from './mikro-orm.config'
+import { Post } from './entities/Post'
+import { User } from './entities/User'
 import { HelloResolver } from './resolvers/hello'
 import { PostResolver } from './resolvers/post'
 import { UserResolver } from './resolvers/user'
 
 const main = async () => {
   // connect to db
-  const orm = await MikroORM.init(mikroConfig)
-
-  // run migrations
-  try {
-    await orm.getMigrator().up()
-  } catch {
-    console.error('check postgresql service')
-  }
+  await createConnection({
+    type: 'postgres',
+    database: 'reddit_clone_db_2',
+    logging: true,
+    synchronize: true,
+    username: 'postgres',
+    password: 'postgres',
+    entities: [User, Post]
+  })
 
   // initialize express
   const app = express()
@@ -67,7 +69,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res, redis })
+    context: ({ req, res }) => ({ req, res, redis })
   })
   apolloServer.applyMiddleware({ app, cors: false })
 
