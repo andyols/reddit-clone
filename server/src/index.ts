@@ -5,7 +5,7 @@ import cors from 'cors'
 import 'dotenv-safe/config'
 import express from 'express'
 import session from 'express-session'
-import redis from 'redis'
+import Redis from 'ioredis'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
 import { _COOKIE_NAME_, _PROD_ } from './constants'
@@ -30,7 +30,7 @@ const main = async () => {
 
   // redis setup
   const RedisStore = connectRedis(session)
-  const redisClient = redis.createClient()
+  const redis = new Redis()
 
   // apply cors to all routes
   app.use(
@@ -45,7 +45,7 @@ const main = async () => {
     session({
       name: _COOKIE_NAME_,
       store: new RedisStore({
-        client: redisClient,
+        client: redis,
         disableTouch: true,
         disableTTL: true
       }),
@@ -67,7 +67,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res })
+    context: ({ req, res }) => ({ em: orm.em, req, res, redis })
   })
   apolloServer.applyMiddleware({ app, cors: false })
 
