@@ -19,8 +19,10 @@ export const InputField: React.FC<InputFieldProps> = ({
 }) => {
   const [field, { error }] = useField(props)
 
+  const invalid = !!error || !!props['aria-invalid']
+
   return (
-    <FormControl isInvalid={!!error}>
+    <FormControl isInvalid={invalid}>
       <FormLabel htmlFor={field.name}>{label}</FormLabel>
       <Input
         {...field}
@@ -28,7 +30,7 @@ export const InputField: React.FC<InputFieldProps> = ({
         id={field.name}
         placeholder={props.placeholder}
       />
-      {error && <FormErrorMessage>{error}</FormErrorMessage>}
+      {invalid && <FormErrorMessage>{error || props.alt}</FormErrorMessage>}
     </FormControl>
   )
 }
