@@ -5,10 +5,11 @@ import 'dotenv-safe/config'
 import express from 'express'
 import session from 'express-session'
 import Redis from 'ioredis'
+import path from 'path'
 import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
 import { createConnection } from 'typeorm'
-import { _COOKIE_NAME_, _PROD_ } from './constants'
+import { __COOKIE_NAME, __PROD } from './constants'
 import { Post } from './entities/Post'
 import { User } from './entities/User'
 import { HelloResolver } from './resolvers/hello'
@@ -17,15 +18,19 @@ import { UserResolver } from './resolvers/user'
 
 const main = async () => {
   // connect to db
-  await createConnection({
+  const conn = await createConnection({
     type: 'postgres',
     database: 'reddit_clone_db_2',
     logging: true,
     synchronize: true,
     username: 'postgres',
     password: 'postgres',
+    migrations: [path.join(__dirname, './migrations/*')],
     entities: [User, Post]
   })
+
+  // run any pending migrations
+  await conn.runMigrations()
 
   // initialize express
   const app = express()
@@ -45,7 +50,7 @@ const main = async () => {
   // express-session setup
   app.use(
     session({
-      name: _COOKIE_NAME_,
+      name: __COOKIE_NAME,
       store: new RedisStore({
         client: redis,
         disableTouch: true,
@@ -54,7 +59,7 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true, // frontend js cannot access cookie
-        secure: _PROD_, // cookie only works in https
+        secure: __PROD, // cookie only works in https
         sameSite: 'lax' // protect csrf
       },
       secret: process.env.SESSION_KEY!,

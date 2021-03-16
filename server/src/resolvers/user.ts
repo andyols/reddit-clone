@@ -9,7 +9,7 @@ import {
   Resolver
 } from 'type-graphql'
 import { v4 } from 'uuid'
-import { _COOKIE_NAME_, __FORGET_PASSWORD_PREFIX } from '../constants'
+import { __COOKIE_NAME, __FORGET_PASSWORD_PREFIX } from '../constants'
 import { User } from '../entities/User'
 import { MyContext } from '../types'
 import { sendEmail } from '../utils/sendEmail'
@@ -244,7 +244,7 @@ export class UserResolver {
         }
 
         // clear the cookie
-        res.clearCookie(_COOKIE_NAME_)
+        res.clearCookie(__COOKIE_NAME)
         resolve(true)
       })
     )
