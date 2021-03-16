@@ -10,15 +10,17 @@ import React, { InputHTMLAttributes } from 'react'
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string
   name: string
+  otherError?: string
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   size: _,
+  otherError,
   ...props
 }) => {
   const [field, { error }] = useField(props)
-  const invalid = !!error || !!props['aria-invalid']
+  const invalid = !!error || !!otherError
 
   return (
     <FormControl isInvalid={invalid}>
@@ -29,7 +31,7 @@ export const InputField: React.FC<InputFieldProps> = ({
         id={field.name}
         placeholder={props.placeholder}
       />
-      {invalid && <FormErrorMessage>{error || props.alt}</FormErrorMessage>}
+      {invalid && <FormErrorMessage>{error || otherError}</FormErrorMessage>}
     </FormControl>
   )
 }

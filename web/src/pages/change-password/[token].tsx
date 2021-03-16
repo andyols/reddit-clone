@@ -9,13 +9,10 @@ import { InputField } from '../../components/InputField'
 import { Wrapper } from '../../components/Wrapper'
 import { useChangePasswordMutation } from '../../generated/graphql'
 import { createUrqlClient } from '../../utils/createUrqlClient'
+import { stringOrThis } from '../../utils/stringOrThis'
 import { toErrorMap } from '../../utils/toErrorMap'
 
-interface Props {
-  token?: string
-}
-
-const ChangePassword: NextPage<Props> = ({ token = '' }) => {
+const ChangePassword: NextPage = () => {
   const router = useRouter()
   const [, changePassword] = useChangePasswordMutation()
   const [tokenError, setTokenError] = useState('')
@@ -27,7 +24,7 @@ const ChangePassword: NextPage<Props> = ({ token = '' }) => {
         onSubmit={async (values, { setErrors }) => {
           const response = await changePassword({
             newPassword: values.newPassword,
-            token
+            token: stringOrThis(router.query.token, '')
           })
           if (response.data?.changePassword.errors) {
             const errorMap = toErrorMap(response.data.changePassword.errors)
@@ -50,10 +47,9 @@ const ChangePassword: NextPage<Props> = ({ token = '' }) => {
               placeholder='new password'
               label='New Password'
               type='password'
-              aria-invalid={!!tokenError}
-              alt={tokenError}
+              otherError={tokenError}
             />
-            {tokenError ? (
+            {tokenError && (
               <NextLink href='/forgot-password'>
                 <Button
                   as='a'
@@ -64,22 +60,15 @@ const ChangePassword: NextPage<Props> = ({ token = '' }) => {
                   Reset password again
                 </Button>
               </NextLink>
-            ) : (
-              <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
-                Submit
-              </Button>
             )}
+            <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+              Submit
+            </Button>
           </Stack>
         )}
       </Formik>
     </Wrapper>
   )
-}
-
-ChangePassword.getInitialProps = ({ query }) => {
-  return {
-    token: query.token as string
-  }
 }
 
 export default withUrqlClient(createUrqlClient)(ChangePassword)

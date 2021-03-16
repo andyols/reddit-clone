@@ -8,6 +8,7 @@ import { InputField } from '../components/InputField'
 import { Wrapper } from '../components/Wrapper'
 import { useLoginMutation } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
+import { stringOrThis } from '../utils/stringOrThis'
 import { toErrorMap } from '../utils/toErrorMap'
 
 const Login: React.FC<{}> = ({}) => {
@@ -20,12 +21,12 @@ const Login: React.FC<{}> = ({}) => {
         initialValues={{ usernameOrEmail: '', password: '' }}
         onSubmit={async (values, { setErrors }) => {
           const response = await login(values)
-
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors))
           } else if (response.data?.login.user) {
             // yay, it worked
-            router.push('/')
+            // redirect user
+            router.push(stringOrThis(router.query.next, '/'))
           }
         }}
       >
