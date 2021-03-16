@@ -11,16 +11,19 @@ import {
 } from '@chakra-ui/react'
 import { withUrqlClient } from 'next-urql'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { usePostsQuery } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
 
 const Index = () => {
+  const [variables, setVariables] = useState({
+    limit: 33,
+    cursor: null as string | null
+  })
+
   const [{ data, fetching }] = usePostsQuery({
-    variables: {
-      limit: 10
-    }
+    variables
   })
 
   // post query failed for some reason
@@ -33,6 +36,7 @@ const Index = () => {
       <Stack spacing={4}>
         <HStack w='full' justify='space-between'>
           <Heading>New Posts</Heading>
+
           <Link href='/create-post'>
             <Button justifySelf='end' colorScheme='green'>
               Create a post
@@ -45,26 +49,32 @@ const Index = () => {
         <Spinner />
       ) : (
         <Stack spacing={4}>
-          {data!.posts.map((p) => (
-            <Box
-              key={p.id}
-              p={5}
-              shadow='md'
-              borderWidth='1px'
-              borderRadius='base'
-            >
+          {data!.posts.posts.map((p) => (
+            <Box key={p.id} p={5} shadow='xs' bg='white' borderRadius='base'>
               <Heading fontSize='xl'>{p.title}</Heading>
               <Text mt={4}>{p.textSnippet} ...</Text>
             </Box>
           ))}
-          {data && (
-            <Flex pt={2} pb={6}>
-              <Button colorScheme='blue' isLoading={fetching} m='auto'>
-                Load More
-              </Button>
-            </Flex>
-          )}
         </Stack>
+      )}
+      {data && data.posts.hasMore && (
+        <Flex>
+          <Button
+            colorScheme='blue'
+            isLoading={fetching}
+            m='auto'
+            my={8}
+            isDisabled={!data.posts.hasMore}
+            onClick={() => {
+              setVariables({
+                limit: variables.limit,
+                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt
+              })
+            }}
+          >
+            Load More
+          </Button>
+        </Flex>
       )}
     </Layout>
   )
