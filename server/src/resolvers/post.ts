@@ -3,11 +3,13 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   Query,
   Resolver,
   UseMiddleware
 } from 'type-graphql'
+import { getConnection } from 'typeorm'
 import { Post } from '../entities/Post'
 import { isAuth } from '../middleware/isAuth'
 import { MyContext } from '../types'
@@ -24,8 +26,23 @@ class PostInput {
 export class PostResolver {
   // get all posts
   @Query(() => [Post])
-  posts(): Promise<Post[]> {
-    return Post.find()
+  posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null
+  ): Promise<Post[]> {
+    const realLimit = Math.min(50, limit)
+
+    const qb = getConnection()
+      .getRepository(Post)
+      .createQueryBuilder('p')
+      .orderBy('"createdAt"', 'DESC') // make casing explicit with double quotes
+      .take(realLimit)
+
+    if (cursor) {
+      qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
+    }
+
+    return qb.getMany()
   }
 
   // get single post by id

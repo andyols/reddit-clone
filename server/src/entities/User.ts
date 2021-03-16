@@ -33,7 +33,7 @@ export class User extends BaseEntity {
   posts: Post[]
 
   @Field(() => String)
-  @CreateDateColumn({ type: 'date' })
+  @CreateDateColumn()
   createdAt: Date
 
   @Field(() => String)
