@@ -1,5 +1,5 @@
+import { AddIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Button,
   Divider,
   Flex,
@@ -12,6 +12,7 @@ import {
 import { withUrqlClient } from 'next-urql'
 import Link from 'next/link'
 import React, { useState } from 'react'
+import { DootSection } from '../components/DootSection'
 import { Layout } from '../components/Layout'
 import { usePostsQuery } from '../generated/graphql'
 import { createUrqlClient } from '../utils/createUrqlClient'
@@ -37,7 +38,12 @@ const Index = () => {
         <HStack w='full' justify='space-between'>
           <Heading>New Posts</Heading>
           <Link href='/create-post'>
-            <Button justifySelf='end' colorScheme='green'>
+            <Button
+              justifySelf='end'
+              colorScheme='green'
+              lineHeight={0}
+              rightIcon={<AddIcon />}
+            >
               Create a post
             </Button>
           </Link>
@@ -49,13 +55,16 @@ const Index = () => {
       ) : (
         <Stack spacing={4}>
           {data!.posts.posts.map((p) => (
-            <Box key={p.id} p={5} shadow='xs' bg='white' borderRadius='base'>
-              <Text color='gray.500' fontSize='sm'>
-                posted by @{p.creator.username} {}
-              </Text>
-              <Heading fontSize='xl'>{p.title}</Heading>
-              {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
-            </Box>
+            <HStack key={p.id} p={5} shadow='xs' bg='white' borderRadius='base'>
+              <DootSection post={p} />
+              <Stack spacing={0} alignSelf='start'>
+                <Text color='gray.500' fontSize='sm'>
+                  posted by @{p.creator.username} {}
+                </Text>
+                <Heading fontSize='xl'>{p.title}</Heading>
+                {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
+              </Stack>
+            </HStack>
           ))}
         </Stack>
       )}

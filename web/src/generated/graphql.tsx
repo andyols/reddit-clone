@@ -67,7 +67,7 @@ export type Mutation = {
   __typename?: 'Mutation'
   createPost: Post
   updatePost?: Maybe<Post>
-  vote: Scalars['Boolean']
+  doot: Scalars['Boolean']
   deletePost: Scalars['Boolean']
   changePassword: UserResponse
   forgotPassword: Scalars['Boolean']
@@ -85,7 +85,7 @@ export type MutationUpdatePostArgs = {
   id: Scalars['Float']
 }
 
-export type MutationVoteArgs = {
+export type MutationDootArgs = {
   value: Scalars['Int']
   postId: Scalars['Int']
 }
@@ -135,6 +135,11 @@ export type UserOptions = {
   password: Scalars['String']
 }
 
+export type PostSnippetFragment = { __typename?: 'Post' } & Pick<
+  Post,
+  'id' | 'createdAt' | 'updatedAt' | 'title' | 'textSnippet' | 'points'
+> & { creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'> }
+
 export type StandardErrorFragment = { __typename?: 'FieldError' } & Pick<
   FieldError,
   'field' | 'message'
@@ -169,6 +174,13 @@ export type CreatePostMutation = { __typename?: 'Mutation' } & {
     'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'points' | 'creatorId'
   >
 }
+
+export type DootMutationVariables = Exact<{
+  value: Scalars['Int']
+  postId: Scalars['Int']
+}>
+
+export type DootMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'doot'>
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String']
@@ -216,15 +228,24 @@ export type PostsQueryVariables = Exact<{
 
 export type PostsQuery = { __typename?: 'Query' } & {
   posts: { __typename?: 'PaginatedPosts' } & Pick<PaginatedPosts, 'hasMore'> & {
-      posts: Array<
-        { __typename?: 'Post' } & Pick<
-          Post,
-          'id' | 'createdAt' | 'updatedAt' | 'title' | 'textSnippet'
-        > & { creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'> }
-      >
+      posts: Array<{ __typename?: 'Post' } & PostSnippetFragment>
     }
 }
 
+export const PostSnippetFragmentDoc = gql`
+  fragment PostSnippet on Post {
+    id
+    createdAt
+    updatedAt
+    title
+    textSnippet
+    points
+    creator {
+      id
+      username
+    }
+  }
+`
 export const StandardErrorFragmentDoc = gql`
   fragment StandardError on FieldError {
     field
@@ -282,6 +303,15 @@ export function useCreatePostMutation() {
   return Urql.useMutation<CreatePostMutation, CreatePostMutationVariables>(
     CreatePostDocument
   )
+}
+export const DootDocument = gql`
+  mutation Doot($value: Int!, $postId: Int!) {
+    doot(value: $value, postId: $postId)
+  }
+`
+
+export function useDootMutation() {
+  return Urql.useMutation<DootMutation, DootMutationVariables>(DootDocument)
 }
 export const ForgotPasswordDocument = gql`
   mutation ForgotPassword($email: String!) {
@@ -351,18 +381,11 @@ export const PostsDocument = gql`
     posts(cursor: $cursor, limit: $limit) {
       hasMore
       posts {
-        id
-        createdAt
-        updatedAt
-        title
-        textSnippet
-        creator {
-          id
-          username
-        }
+        ...PostSnippet
       }
     }
   }
+  ${PostSnippetFragmentDoc}
 `
 
 export function usePostsQuery(
