@@ -124,6 +124,18 @@ export const createUrqlClient = (ssrExchange: any) => ({
               _result,
               () => ({ me: null })
             )
+          },
+
+          createPost: (_result, _args, cache, _info) => {
+            // invalidate all queries associated with 'posts'
+            const allFields = cache.inspectFields('Query')
+            const fieldInfos = allFields.filter(
+              (info) => info.fieldName === 'posts'
+            )
+            // encompass all arguments of this query when invalidating
+            fieldInfos.forEach((fi) => {
+              cache.invalidate('Query', 'posts', fi.arguments || {})
+            })
           }
         }
       }

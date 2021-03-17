@@ -18,7 +18,7 @@ import { createUrqlClient } from '../utils/createUrqlClient'
 
 const Index = () => {
   const [variables, setVariables] = useState({
-    limit: 33,
+    limit: 10,
     cursor: null as string | null
   })
 
@@ -36,7 +36,6 @@ const Index = () => {
       <Stack spacing={4}>
         <HStack w='full' justify='space-between'>
           <Heading>New Posts</Heading>
-
           <Link href='/create-post'>
             <Button justifySelf='end' colorScheme='green'>
               Create a post
@@ -51,8 +50,11 @@ const Index = () => {
         <Stack spacing={4}>
           {data!.posts.posts.map((p) => (
             <Box key={p.id} p={5} shadow='xs' bg='white' borderRadius='base'>
+              <Text color='gray.500' fontSize='sm'>
+                posted by @{p.creator.username} {}
+              </Text>
               <Heading fontSize='xl'>{p.title}</Heading>
-              <Text mt={4}>{p.textSnippet} ...</Text>
+              {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
             </Box>
           ))}
         </Stack>
