@@ -10,8 +10,8 @@ import 'reflect-metadata'
 import { buildSchema } from 'type-graphql'
 import { createConnection } from 'typeorm'
 import { __COOKIE_NAME, __PROD } from './constants'
+import { Doot } from './entities/Doot'
 import { Post } from './entities/Post'
-import { Updoot } from './entities/Updoot'
 import { User } from './entities/User'
 import { HelloResolver } from './resolvers/hello'
 import { PostResolver } from './resolvers/post'
@@ -27,7 +27,7 @@ const main = async () => {
     username: 'postgres',
     password: 'postgres',
     migrations: [path.join(__dirname, './migrations/*')],
-    entities: [User, Post, Updoot]
+    entities: [User, Post, Doot]
   })
 
   // run any pending migrations

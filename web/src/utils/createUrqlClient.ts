@@ -1,4 +1,5 @@
 import { cacheExchange, Resolver } from '@urql/exchange-graphcache'
+import gql from 'graphql-tag'
 import Router from 'next/router'
 import {
   dedupExchange,
@@ -8,6 +9,7 @@ import {
 } from 'urql'
 import { pipe, tap } from 'wonka'
 import {
+  DootMutationVariables,
   LoginMutation,
   LogoutMutation,
   MeDocument,
@@ -136,6 +138,34 @@ export const createUrqlClient = (ssrExchange: any) => ({
             fieldInfos.forEach((fi) => {
               cache.invalidate('Query', 'posts', fi.arguments || {})
             })
+          },
+
+          doot: (_result, args, cache, _info) => {
+            const { postId, value } = args as DootMutationVariables
+            const data = cache.readFragment(
+              gql`
+                fragment _ on Post {
+                  id
+                  points
+                  dootStatus
+                }
+              `,
+              { id: postId } as any
+            )
+            if (data) {
+              if (data.dootStatus === args.value) return
+              const newPoints =
+                (data.points as number) + (!data.dootStatus ? 1 : 2) * value
+              cache.writeFragment(
+                gql`
+                  fragment _ on Post {
+                    points
+                    dootStatus
+                  }
+                `,
+                { id: postId, points: newPoints, dootStatus: value } as any
+              )
+            }
           }
         }
       }

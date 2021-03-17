@@ -17,11 +17,12 @@ export const DootSection: React.FC<DootSection> = ({ post }) => {
         aria-label='updoot post'
         icon={<TriangleUpIcon />}
         size='xs'
-        color='gray.500'
+        color={post.dootStatus === 1 ? 'orange.500' : 'gray.500'}
         borderRadius='sm'
         _hover={{ color: 'orange.500', bg: 'gray.100' }}
         variant='ghost'
         onClick={async () => {
+          if (post.dootStatus === 1) return
           setLoading('updoot')
           await doot({
             postId: post.id,
@@ -39,10 +40,11 @@ export const DootSection: React.FC<DootSection> = ({ post }) => {
         icon={<TriangleDownIcon />}
         size='xs'
         borderRadius='sm'
-        color='gray.500'
+        color={post.dootStatus === -1 ? 'blue.500' : 'gray.500'}
         _hover={{ color: 'blue.500', bg: 'gray.100' }}
         variant='ghost'
         onClick={async () => {
+          if (post.dootStatus === -1) return
           setLoading('downdoot')
           await doot({
             postId: post.id,

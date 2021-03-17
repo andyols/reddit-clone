@@ -47,6 +47,7 @@ export type Post = {
   title: Scalars['String']
   text: Scalars['String']
   points: Scalars['Float']
+  dootStatus?: Maybe<Scalars['Int']>
   creatorId: Scalars['Float']
   creator: User
   createdAt: Scalars['String']
@@ -137,7 +138,13 @@ export type UserOptions = {
 
 export type PostSnippetFragment = { __typename?: 'Post' } & Pick<
   Post,
-  'id' | 'createdAt' | 'updatedAt' | 'title' | 'textSnippet' | 'points'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'title'
+  | 'textSnippet'
+  | 'points'
+  | 'dootStatus'
 > & { creator: { __typename?: 'User' } & Pick<User, 'id' | 'username'> }
 
 export type StandardErrorFragment = { __typename?: 'FieldError' } & Pick<
@@ -240,6 +247,7 @@ export const PostSnippetFragmentDoc = gql`
     title
     textSnippet
     points
+    dootStatus
     creator {
       id
       username

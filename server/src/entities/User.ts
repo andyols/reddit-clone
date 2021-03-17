@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
+import { Doot } from './Doot'
 import { Post } from './Post'
-import { Updoot } from './Updoot'
 
 @ObjectType()
 @Entity()
@@ -33,8 +33,8 @@ export class User extends BaseEntity {
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[]
 
-  @OneToMany(() => Updoot, (updoot) => updoot.user)
-  updoots: Updoot[]
+  @OneToMany(() => Doot, (doot) => doot.user)
+  doots: Doot[]
 
   @Field(() => String)
   @CreateDateColumn()

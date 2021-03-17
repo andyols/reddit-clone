@@ -5,19 +5,19 @@ import { User } from './User'
 
 @ObjectType()
 @Entity()
-export class Updoot extends BaseEntity {
+export class Doot extends BaseEntity {
   @Column({ type: 'int' })
   value: number
 
   @PrimaryColumn()
   userId: number
 
-  @ManyToOne(() => User, (user) => user.updoots)
+  @ManyToOne(() => User, (user) => user.doots)
   user: User
 
   @PrimaryColumn()
   postId: number
 
-  @ManyToOne(() => Post, (user) => user.updoots)
+  @ManyToOne(() => Post, (user) => user.doots)
   post: Post
 }
