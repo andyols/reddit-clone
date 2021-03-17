@@ -3,10 +3,12 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   Mutation,
   ObjectType,
   Query,
-  Resolver
+  Resolver,
+  Root
 } from 'type-graphql'
 import { v4 } from 'uuid'
 import { __COOKIE_NAME, __FORGET_PASSWORD_PREFIX } from '../constants'
@@ -36,8 +38,17 @@ class UserResponse {
   user?: User
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  // only return email if this is the current auth user
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    if (req.session.userId === user.id) {
+      return user.email
+    }
+    return ''
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg('token') token: string,
