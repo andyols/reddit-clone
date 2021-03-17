@@ -17,6 +17,7 @@ import {
   RegisterMutation
 } from '../generated/graphql'
 import { betterUpdateQuery } from './betterUpdateQuery'
+import { isServer } from './isServer'
 
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
   return pipe(
@@ -69,109 +70,123 @@ const cursorPagination = (): Resolver => {
   }
 }
 
-export const createUrqlClient = (ssrExchange: any) => ({
-  url: 'http://localhost:4000/graphql',
-  fetchOptions: { credentials: 'include' } as const,
-  exchanges: [
-    dedupExchange,
-    cacheExchange({
-      keys: {
-        PaginatedPosts: () => null
-      },
-      resolvers: {
-        Query: {
-          posts: cursorPagination()
-        }
-      },
-      updates: {
-        Mutation: {
-          register: (_result, _args, cache, _info) => {
-            betterUpdateQuery<RegisterMutation, MeQuery>(
-              cache,
-              { query: MeDocument },
-              _result,
-              (result, query) => {
-                if (result.register.errors) {
-                  return query
-                } else {
-                  return {
-                    me: result.register.user
+export const createUrqlClient = (ssrExchange: any, ctx: any) => {
+  let cookie
+  if (isServer()) {
+    cookie = ctx.req.headers.cookie
+  }
+
+  return {
+    url: 'http://localhost:4000/graphql',
+    fetchOptions: {
+      credentials: 'include',
+      headers: cookie
+        ? {
+            cookie
+          }
+        : undefined
+    } as const,
+    exchanges: [
+      dedupExchange,
+      cacheExchange({
+        keys: {
+          PaginatedPosts: () => null
+        },
+        resolvers: {
+          Query: {
+            posts: cursorPagination()
+          }
+        },
+        updates: {
+          Mutation: {
+            register: (_result, _args, cache, _info) => {
+              betterUpdateQuery<RegisterMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                (result, query) => {
+                  if (result.register.errors) {
+                    return query
+                  } else {
+                    return {
+                      me: result.register.user
+                    }
                   }
                 }
-              }
-            )
-          },
+              )
+            },
 
-          login: (_result, _args, cache, _info) => {
-            betterUpdateQuery<LoginMutation, MeQuery>(
-              cache,
-              { query: MeDocument },
-              _result,
-              (result, query) => {
-                if (result.login.errors) {
-                  return query
-                } else {
-                  return {
-                    me: result.login.user
+            login: (_result, _args, cache, _info) => {
+              betterUpdateQuery<LoginMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                (result, query) => {
+                  if (result.login.errors) {
+                    return query
+                  } else {
+                    return {
+                      me: result.login.user
+                    }
                   }
                 }
-              }
-            )
-          },
+              )
+            },
 
-          logout: (_result, _args, cache, _info) => {
-            betterUpdateQuery<LogoutMutation, MeQuery>(
-              cache,
-              { query: MeDocument },
-              _result,
-              () => ({ me: null })
-            )
-          },
+            logout: (_result, _args, cache, _info) => {
+              betterUpdateQuery<LogoutMutation, MeQuery>(
+                cache,
+                { query: MeDocument },
+                _result,
+                () => ({ me: null })
+              )
+            },
 
-          createPost: (_result, _args, cache, _info) => {
-            // invalidate all queries associated with 'posts'
-            const allFields = cache.inspectFields('Query')
-            const fieldInfos = allFields.filter(
-              (info) => info.fieldName === 'posts'
-            )
-            // encompass all arguments of this query when invalidating
-            fieldInfos.forEach((fi) => {
-              cache.invalidate('Query', 'posts', fi.arguments || {})
-            })
-          },
+            createPost: (_result, _args, cache, _info) => {
+              // invalidate all queries associated with 'posts'
+              const allFields = cache.inspectFields('Query')
+              const fieldInfos = allFields.filter(
+                (info) => info.fieldName === 'posts'
+              )
+              // encompass all arguments of this query when invalidating
+              fieldInfos.forEach((fi) => {
+                cache.invalidate('Query', 'posts', fi.arguments || {})
+              })
+            },
 
-          doot: (_result, args, cache, _info) => {
-            const { postId, value } = args as DootMutationVariables
-            const data = cache.readFragment(
-              gql`
-                fragment _ on Post {
-                  id
-                  points
-                  dootStatus
-                }
-              `,
-              { id: postId } as any
-            )
-            if (data) {
-              if (data.dootStatus === args.value) return
-              const newPoints =
-                (data.points as number) + (!data.dootStatus ? 1 : 2) * value
-              cache.writeFragment(
+            doot: (_result, args, cache, _info) => {
+              const { postId, value } = args as DootMutationVariables
+              const data = cache.readFragment(
                 gql`
                   fragment _ on Post {
+                    id
                     points
                     dootStatus
                   }
                 `,
-                { id: postId, points: newPoints, dootStatus: value } as any
+                { id: postId } as any
               )
+              if (data) {
+                if (data.dootStatus === args.value) return
+                const newPoints =
+                  (data.points as number) + (!data.dootStatus ? 1 : 2) * value
+                cache.writeFragment(
+                  gql`
+                    fragment _ on Post {
+                      points
+                      dootStatus
+                    }
+                  `,
+                  { id: postId, points: newPoints, dootStatus: value } as any
+                )
+              }
             }
           }
         }
-      }
-    }),
-    errorExchange,
-    ssrExchange,
-    fetchExchange
-  ]
-})
+      }),
+      errorExchange,
+      ssrExchange,
+      fetchExchange
+    ]
+  }
+}
