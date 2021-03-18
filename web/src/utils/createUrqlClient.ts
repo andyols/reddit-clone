@@ -9,6 +9,7 @@ import {
 } from 'urql'
 import { pipe, tap } from 'wonka'
 import {
+  DeletePostMutationVariables,
   DootMutationVariables,
   LoginMutation,
   LogoutMutation,
@@ -151,6 +152,13 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
               // encompass all arguments of this query when invalidating
               fieldInfos.forEach((fi) => {
                 cache.invalidate('Query', 'posts', fi.arguments || {})
+              })
+            },
+
+            deletePost: (_result, args, cache, _info) => {
+              cache.invalidate({
+                __typename: 'Post',
+                id: (args as DeletePostMutationVariables).id
               })
             },
 

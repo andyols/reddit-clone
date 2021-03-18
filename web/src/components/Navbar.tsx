@@ -35,9 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     body = (
       <>
         <Link href='/create-post'>
-          <Button as='a' colorScheme='whatsapp'>
-            Create a Post
-          </Button>
+          <Button colorScheme='whatsapp'>Create a Post</Button>
         </Link>
         <Button
           as='a'

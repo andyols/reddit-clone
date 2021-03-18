@@ -18,6 +18,8 @@ export class Doot extends BaseEntity {
   @PrimaryColumn()
   postId: number
 
-  @ManyToOne(() => Post, (user) => user.doots)
+  @ManyToOne(() => Post, (user) => user.doots, {
+    onDelete: 'CASCADE'
+  })
   post: Post
 }
