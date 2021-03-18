@@ -4,7 +4,6 @@ import {
   Flex,
   Heading,
   HStack,
-  Icon,
   Link as ChakraLink,
   Spinner,
   Stack,
@@ -12,30 +11,22 @@ import {
 } from '@chakra-ui/react'
 import { DootSection } from '@components/DootSection'
 import { Layout } from '@components/Layout'
-import {
-  useDeletePostMutation,
-  useMeQuery,
-  usePostsQuery
-} from '@generated/graphql'
+import { PostActionsMenu } from '@components/PostActionsMenu'
+import { useMeQuery, usePostsQuery } from '@generated/graphql'
 import { createUrqlClient } from '@utils/createUrqlClient'
 import { withUrqlClient } from 'next-urql'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { FiDelete } from 'react-icons/fi'
 
 const Index = () => {
   const [variables, setVariables] = useState({
     limit: 10,
     cursor: null as string | null
   })
-
   const [{ data, fetching }] = usePostsQuery({
     variables
   })
-
-  const [{ data: me }] = useMeQuery()
-
-  const [, deletePost] = useDeletePostMutation()
+  const [{ data: meData }] = useMeQuery()
 
   // post query failed for some reason
   if (!fetching && !data) {
@@ -77,21 +68,11 @@ const Index = () => {
                     {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
                   </Stack>
                 </HStack>
-                {me?.me?.id === p.creator.id && (
-                  <Icon
-                    alignSelf='flex-start'
-                    as={FiDelete}
-                    color='red.500'
-                    _hover={{
-                      cursor: 'pointer',
-                      color: 'red.700',
-                      transform: 'scale(1.1)'
-                    }}
-                    w={5}
-                    h={5}
-                    aria-label='Delete Post'
-                    onClick={() => deletePost({ id: p.id })}
-                  />
+
+                {meData?.me?.id === p.creator.id && (
+                  <Flex alignSelf='start'>
+                    <PostActionsMenu id={p.id} />
+                  </Flex>
                 )}
               </HStack>
             )

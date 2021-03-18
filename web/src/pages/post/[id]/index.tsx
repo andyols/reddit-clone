@@ -5,27 +5,22 @@ import {
   AlertTitle,
   Divider,
   Heading,
+  HStack,
   Spinner,
   Stack,
   Text
 } from '@chakra-ui/react'
 import { Layout } from '@components/Layout'
-import { usePostQuery } from '@generated/graphql'
+import { PostActionsMenu } from '@components/PostActionsMenu'
 import { createUrqlClient } from '@utils/createUrqlClient'
+import { usePostFromUrl } from '@utils/usePostFromUrl'
+import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
 import { withUrqlClient } from 'next-urql'
-import { useRouter } from 'next/router'
 import React from 'react'
 
 export const Post = ({}) => {
-  const router = useRouter()
-  const intId =
-    typeof router.query.id === 'string' ? parseInt(router.query.id) : -1
-  const [{ data, fetching }] = usePostQuery({
-    pause: intId === -1, // bad url param, dont bother with request
-    variables: {
-      id: intId
-    }
-  })
+  const id = usePostIdFromUrl()
+  const [{ data, fetching }] = usePostFromUrl()
 
   if (fetching) {
     return (
@@ -50,7 +45,10 @@ export const Post = ({}) => {
   return (
     <Layout>
       <Stack>
-        <Heading>{data?.post?.title}</Heading>
+        <HStack justify='space-between'>
+          <Heading>{data?.post?.title}</Heading>
+          <PostActionsMenu id={id} />
+        </HStack>
         <Divider />
         <Text>{data?.post?.text}</Text>
       </Stack>

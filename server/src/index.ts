@@ -21,11 +21,9 @@ const main = async () => {
   // connect to db
   const conn = await createConnection({
     type: 'postgres',
-    database: 'reddit_clone_db_2',
+    database: 'mokkit_db',
     logging: true,
     synchronize: true,
-    username: 'postgres',
-    password: 'postgres',
     migrations: [path.join(__dirname, './migrations/*')],
     entities: [User, Post, Doot]
   })
