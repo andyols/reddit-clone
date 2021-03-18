@@ -1,14 +1,8 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Button,
-  Spinner,
-  Stack
-} from '@chakra-ui/react'
+import { Button, Stack } from '@chakra-ui/react'
+import { ErrorAlert } from '@components/ErrorAlert'
 import { InputField } from '@components/InputField'
 import { Layout } from '@components/Layout'
+import { Loader } from '@components/Loader'
 import { TextareaField } from '@components/TextareaField'
 import { usePostQuery, useUpdatePostMutation } from '@generated/graphql'
 import { createUrqlClient } from '@utils/createUrqlClient'
@@ -21,7 +15,7 @@ import React from 'react'
 const EditPost = () => {
   const router = useRouter()
   const id = usePostIdFromUrl()
-  const [{ data, fetching }] = usePostQuery({
+  const [{ data, error, fetching }] = usePostQuery({
     pause: id === -1, // bad url param, dont bother with request
     variables: {
       id
@@ -29,24 +23,14 @@ const EditPost = () => {
   })
   const [, updatePost] = useUpdatePostMutation()
 
-  if (fetching) {
-    return (
-      <Layout>
-        <Spinner />
-      </Layout>
-    )
+  // post query failed for some reason
+  if (error && !fetching) {
+    return <ErrorAlert message={error.message} />
   }
 
-  if (!data?.post) {
-    return (
-      <Layout>
-        <Alert status='error' borderRadius='base'>
-          <AlertIcon />
-          <AlertTitle mr={2}>Whoopsie!</AlertTitle>
-          <AlertDescription>We couldn't find that post.</AlertDescription>
-        </Alert>
-      </Layout>
-    )
+  // post data has not been resolved yet
+  if (fetching || !data?.post) {
+    return <Loader />
   }
 
   return (

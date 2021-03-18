@@ -5,12 +5,13 @@ import {
   Heading,
   HStack,
   Link as ChakraLink,
-  Spinner,
   Stack,
   Text
 } from '@chakra-ui/react'
 import { DootSection } from '@components/DootSection'
+import { ErrorAlert } from '@components/ErrorAlert'
 import { Layout } from '@components/Layout'
+import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { useMeQuery, usePostsQuery } from '@generated/graphql'
 import { createUrqlClient } from '@utils/createUrqlClient'
@@ -23,14 +24,19 @@ const Index = () => {
     limit: 10,
     cursor: null as string | null
   })
-  const [{ data, fetching }] = usePostsQuery({
+  const [{ data, error, fetching }] = usePostsQuery({
     variables
   })
   const [{ data: meData }] = useMeQuery()
 
   // post query failed for some reason
-  if (!fetching && !data) {
-    return <Text>Whoopsie!</Text>
+  if (error && !fetching) {
+    return <ErrorAlert message={error.message} />
+  }
+
+  // post data has not been resolved yet
+  if (fetching || !data?.posts) {
+    return <Loader />
   }
 
   return (
@@ -39,46 +45,42 @@ const Index = () => {
         <Heading size='lg'>Latest Posts</Heading>
         <Divider mb={4} />
       </Stack>
-      {!data && fetching ? (
-        <Spinner />
-      ) : (
-        <Stack spacing={4} as='section'>
-          {data!.posts.posts.map((p) =>
-            !p ? null : (
-              <HStack
-                as='article'
-                justify='space-between'
-                key={p.id}
-                p={5}
-                shadow='xs'
-                bg='white'
-                borderRadius='base'
-              >
-                <HStack>
-                  <DootSection post={p} />
-                  <Stack spacing={0} alignSelf='start'>
-                    <Text color='gray.500' fontSize='sm'>
-                      posted by @{p.creator.username} {}
-                    </Text>
-                    <Link href={`/post/${p.id}`}>
-                      <Heading as={ChakraLink} fontSize='xl'>
-                        {p.title}
-                      </Heading>
-                    </Link>
-                    {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
-                  </Stack>
-                </HStack>
-
-                {meData?.me?.id === p.creator.id && (
-                  <Flex alignSelf='start'>
-                    <PostActionsMenu id={p.id} />
-                  </Flex>
-                )}
+      <Stack spacing={4} as='section'>
+        {data.posts.posts.map((p) =>
+          !p ? null : (
+            <HStack
+              as='article'
+              justify='space-between'
+              key={p.id}
+              p={5}
+              shadow='xs'
+              bg='white'
+              borderRadius='base'
+            >
+              <HStack>
+                <DootSection post={p} />
+                <Stack spacing={0} alignSelf='start'>
+                  <Text color='gray.500' fontSize='sm'>
+                    posted by @{p.creator.username} {}
+                  </Text>
+                  <Link href={`/post/${p.id}`}>
+                    <Heading as={ChakraLink} fontSize='xl'>
+                      {p.title}
+                    </Heading>
+                  </Link>
+                  {p.textSnippet && <Text mt={4}>{p.textSnippet} ...</Text>}
+                </Stack>
               </HStack>
-            )
-          )}
-        </Stack>
-      )}
+
+              {meData?.me?.id === p.creator.id && (
+                <Flex alignSelf='start'>
+                  <PostActionsMenu id={p.id} />
+                </Flex>
+              )}
+            </HStack>
+          )
+        )}
+      </Stack>
       {data && data.posts.hasMore && (
         <Flex>
           <Button

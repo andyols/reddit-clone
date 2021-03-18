@@ -1,56 +1,42 @@
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Divider,
-  Heading,
-  HStack,
-  Spinner,
-  Stack,
-  Text
-} from '@chakra-ui/react'
+import { Divider, Heading, HStack, Stack, Text } from '@chakra-ui/react'
+import { ErrorAlert } from '@components/ErrorAlert'
 import { Layout } from '@components/Layout'
+import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
+import { usePostQuery } from '@generated/graphql'
 import { createUrqlClient } from '@utils/createUrqlClient'
-import { usePostFromUrl } from '@utils/usePostFromUrl'
 import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
 import { withUrqlClient } from 'next-urql'
 import React from 'react'
 
 export const Post = ({}) => {
   const id = usePostIdFromUrl()
-  const [{ data, fetching }] = usePostFromUrl()
+  const [{ data, error, fetching }] = usePostQuery({
+    pause: id === -1, // bad url param, dont bother with request
+    variables: {
+      id
+    }
+  })
 
-  if (fetching) {
-    return (
-      <Layout>
-        <Spinner />
-      </Layout>
-    )
+  // post query failed for some reason
+  if (!fetching && error) {
+    return <ErrorAlert message={error.message} />
   }
 
-  if (!data?.post) {
-    return (
-      <Layout>
-        <Alert status='error' borderRadius='base'>
-          <AlertIcon />
-          <AlertTitle mr={2}>Whoopsie!</AlertTitle>
-          <AlertDescription>We couldn't find that post.</AlertDescription>
-        </Alert>
-      </Layout>
-    )
+  // post data has not been resolved yet
+  if (fetching || !data?.post) {
+    return <Loader />
   }
 
   return (
     <Layout>
       <Stack>
         <HStack justify='space-between'>
-          <Heading>{data?.post?.title}</Heading>
+          <Heading>{data.post.title}</Heading>
           <PostActionsMenu id={id} />
         </HStack>
         <Divider />
-        <Text>{data?.post?.text}</Text>
+        <Text>{data.post.text}</Text>
       </Stack>
     </Layout>
   )
