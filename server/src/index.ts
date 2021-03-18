@@ -24,6 +24,7 @@ const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
     database: 'mokkit_db',
+    url: process.env.DATABASE_URL,
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, './migrations/*')],
@@ -38,12 +39,12 @@ const main = async () => {
 
   // redis setup
   const RedisStore = connectRedis(session)
-  const redis = new Redis()
+  const redis = new Redis(process.env.REDIS_URL)
 
   // apply cors to all routes
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true
     })
   )
@@ -63,7 +64,7 @@ const main = async () => {
         secure: __PROD, // cookie only works in https
         sameSite: 'lax' // protect csrf
       },
-      secret: process.env.SESSION_KEY!,
+      secret: process.env.SESSION_KEY,
       saveUninitialized: false,
       resave: false
     })
