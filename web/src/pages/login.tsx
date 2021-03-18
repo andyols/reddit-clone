@@ -1,15 +1,15 @@
 import { Button, Stack } from '@chakra-ui/react'
+import { InputField } from '@components/InputField'
+import { Wrapper } from '@components/Wrapper'
+import { useLoginMutation } from '@generated/graphql'
+import { createUrqlClient } from '@utils/createUrqlClient'
+import { stringOrThis } from '@utils/stringOrThis'
+import { toErrorMap } from '@utils/toErrorMap'
 import { Form, Formik } from 'formik'
 import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/dist/client/router'
 import NextLink from 'next/link'
 import React from 'react'
-import { InputField } from '../components/InputField'
-import { Wrapper } from '../components/Wrapper'
-import { useLoginMutation } from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
-import { stringOrThis } from '../utils/stringOrThis'
-import { toErrorMap } from '../utils/toErrorMap'
 
 const Login: React.FC<{}> = ({}) => {
   const router = useRouter()

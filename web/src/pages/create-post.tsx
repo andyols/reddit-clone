@@ -1,14 +1,14 @@
 import { Button, Stack } from '@chakra-ui/react'
+import { InputField } from '@components/InputField'
+import { Layout } from '@components/Layout'
+import { TextareaField } from '@components/TextareaField'
+import { useCreatePostMutation } from '@generated/graphql'
+import { createUrqlClient } from '@utils/createUrqlClient'
+import { useAuthRedirect } from '@utils/useAuthRedirect'
 import { Form, Formik } from 'formik'
 import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/dist/client/router'
 import React from 'react'
-import { InputField } from '../components/InputField'
-import { Layout } from '../components/Layout'
-import { TextareaField } from '../components/TextareaField'
-import { useCreatePostMutation } from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
-import { useAuthRedirect } from '../utils/useAuthRedirect'
 
 const CreatePost: React.FC<{}> = ({}) => {
   const [, createPost] = useCreatePostMutation()

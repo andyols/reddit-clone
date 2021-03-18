@@ -1,7 +1,7 @@
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { IconButton, Stack, Text } from '@chakra-ui/react'
+import { PostSnippetFragment, useDootMutation } from '@generated/graphql'
 import React, { useState } from 'react'
-import { PostSnippetFragment, useDootMutation } from '../generated/graphql'
 
 interface DootSection {
   post: PostSnippetFragment

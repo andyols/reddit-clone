@@ -10,18 +10,18 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { withUrqlClient } from 'next-urql'
-import Link from 'next/link'
-import React, { useState } from 'react'
-import { FiDelete } from 'react-icons/fi'
-import { DootSection } from '../components/DootSection'
-import { Layout } from '../components/Layout'
+import { DootSection } from '@components/DootSection'
+import { Layout } from '@components/Layout'
 import {
   useDeletePostMutation,
   useMeQuery,
   usePostsQuery
-} from '../generated/graphql'
-import { createUrqlClient } from '../utils/createUrqlClient'
+} from '@generated/graphql'
+import { createUrqlClient } from '@utils/createUrqlClient'
+import { withUrqlClient } from 'next-urql'
+import Link from 'next/link'
+import React, { useState } from 'react'
+import { FiDelete } from 'react-icons/fi'
 
 const Index = () => {
   const [variables, setVariables] = useState({

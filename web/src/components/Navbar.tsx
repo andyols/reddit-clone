@@ -1,8 +1,8 @@
 import { Button, Flex, HStack } from '@chakra-ui/react'
+import { useLogoutMutation, useMeQuery } from '@generated/graphql'
+import { isServer } from '@utils/isServer'
 import Link from 'next/link'
 import React from 'react'
-import { useLogoutMutation, useMeQuery } from '../generated/graphql'
-import { isServer } from '../utils/isServer'
 import { SiteLogo } from './SiteLogo'
 
 interface NavbarProps {}

@@ -1,3 +1,12 @@
+import {
+  DeletePostMutationVariables,
+  DootMutationVariables,
+  LoginMutation,
+  LogoutMutation,
+  MeDocument,
+  MeQuery,
+  RegisterMutation
+} from '@generated/graphql'
 import { cacheExchange, Resolver } from '@urql/exchange-graphcache'
 import gql from 'graphql-tag'
 import Router from 'next/router'
@@ -8,15 +17,6 @@ import {
   stringifyVariables
 } from 'urql'
 import { pipe, tap } from 'wonka'
-import {
-  DeletePostMutationVariables,
-  DootMutationVariables,
-  LoginMutation,
-  LogoutMutation,
-  MeDocument,
-  MeQuery,
-  RegisterMutation
-} from '../generated/graphql'
 import { betterUpdateQuery } from './betterUpdateQuery'
 import { isServer } from './isServer'
 
