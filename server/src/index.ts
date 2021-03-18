@@ -16,6 +16,8 @@ import { User } from './entities/User'
 import { HelloResolver } from './resolvers/hello'
 import { PostResolver } from './resolvers/post'
 import { UserResolver } from './resolvers/user'
+import { createDootLoader } from './utils/createDootLoader'
+import { createUserLoader } from './utils/createUserLoader'
 
 const main = async () => {
   // connect to db
@@ -73,7 +75,13 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false
     }),
-    context: ({ req, res }) => ({ req, res, redis })
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+      dootLoader: createDootLoader()
+    })
   })
   apolloServer.applyMiddleware({ app, cors: false })
 

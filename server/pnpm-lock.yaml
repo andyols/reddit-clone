@@ -3,6 +3,7 @@ dependencies:
   argon2: 0.27.1
   connect-redis: 5.1.0
   cors: 2.8.5
+  dataloader: 2.0.0
   dotenv-safe: 8.2.0
   express: 4.17.1
   express-session: 1.17.1
@@ -989,6 +990,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-xtJnJjKi5cg+AT5oZKQs6N79IK4=
+  /dataloader/2.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-YzhyDAwA4TaQIhM5go+vCLmU0UikghC/t9DTQYZR2M/UvZ1MdOhPezSDZcjj9uqQJOMqjLcpWtyW2iNINdlatQ==
   /debug/2.6.9:
     dependencies:
       ms: 2.0.0
@@ -3252,6 +3257,7 @@ specifiers:
   argon2: ^0.27.1
   connect-redis: ^5.1.0
   cors: ^2.8.5
+  dataloader: ^2.0.0
   dotenv-safe: ^8.2.0
   express: ^4.17.1
   express-session: ^1.17.1

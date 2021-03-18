@@ -15,6 +15,7 @@ import {
 import { getConnection } from 'typeorm'
 import { Doot } from '../entities/Doot'
 import { Post } from '../entities/Post'
+import { User } from '../entities/User'
 import { isAuth } from '../middleware/isAuth'
 import { MyContext } from '../types'
 
@@ -38,52 +39,54 @@ class PaginatedPosts {
 
 @Resolver(Post)
 export class PostResolver {
+  // field resolvers will only run if it is included in the gql request
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 50)
+  }
+
+  // get the creator of a post no matter the origin of the request
+  @FieldResolver(() => User)
+  creator(@Root() post: Post, @Ctx() { userLoader }: MyContext) {
+    return userLoader.load(post.creatorId)
+  }
+
+  // get the doot status of a post no matter the origin of the request
+  @FieldResolver(() => Int, { nullable: true })
+  async dootStatus(@Root() post: Post, @Ctx() { dootLoader, req }: MyContext) {
+    // can't have a vote status if you are not logged in
+    if (!req.session.userId) {
+      return null
+    }
+
+    const doot = await dootLoader.load({
+      postId: post.id,
+      userId: req.session.userId
+    })
+
+    return doot ? doot.value : null
   }
 
   // get a up to limit amount of posts
   @Query(() => PaginatedPosts)
   async posts(
     @Arg('limit', () => Int) limit: number,
-    @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
-    @Ctx() { req }: MyContext
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
-    const userId = req.session.userId
     const realLimit = Math.min(50, limit)
     const realLimitPlusOne = realLimit + 1
 
     const replacements: any[] = [realLimitPlusOne]
 
-    if (userId) {
-      replacements.push(userId)
-    }
-
-    let cursorIndex = 3
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)))
-      cursorIndex = replacements.length
     }
 
     const posts = await getConnection().query(
       `
-    select p.*, 
-    json_build_object(
-      'id', u.id,
-      'username', u.username,
-      'email', u.email,
-      'createdAt', u."createdAt",
-      'updatedAt', u."updatedAt"
-    ) creator,
-    ${
-      userId
-        ? `(select value from doot where "userId" = $2 and "postId" = p.id) "dootStatus"`
-        : `null as "dootStatus"`
-    }
+    select p.*
     from post p
-    inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."createdAt" < $${cursorIndex}` : ''}
+    ${cursor ? `where p."createdAt" < $2` : ''}
     order by p."createdAt" DESC
     limit $1
     `,
@@ -99,7 +102,7 @@ export class PostResolver {
   // get single post by id
   @Query(() => Post, { nullable: true })
   post(@Arg('id', () => Int) id: number): Promise<Post | undefined> {
-    return Post.findOne(id, { relations: ['creator'] })
+    return Post.findOne(id)
   }
 
   // create a post
