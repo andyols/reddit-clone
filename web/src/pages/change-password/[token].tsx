@@ -61,7 +61,11 @@ const ChangePassword: NextPage = () => {
                 </Button>
               </NextLink>
             )}
-            <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+            <Button
+              type='submit'
+              colorScheme='whatsapp'
+              isLoading={isSubmitting}
+            >
               Submit
             </Button>
           </Stack>

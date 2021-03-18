@@ -53,7 +53,11 @@ const Login: React.FC<{}> = ({}) => {
                 Forgot password?
               </Button>
             </NextLink>
-            <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+            <Button
+              type='submit'
+              colorScheme='whatsapp'
+              isLoading={isSubmitting}
+            >
               Login
             </Button>
           </Stack>

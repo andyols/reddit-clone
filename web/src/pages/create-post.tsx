@@ -35,7 +35,11 @@ const CreatePost: React.FC<{}> = ({}) => {
               placeholder='What do you have to say?'
               label='Body'
             />
-            <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+            <Button
+              type='submit'
+              colorScheme='whatsapp'
+              isLoading={isSubmitting}
+            >
               Create Post
             </Button>
           </Stack>

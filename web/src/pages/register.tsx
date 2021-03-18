@@ -49,7 +49,11 @@ const Register: React.FC<registerProps> = ({}) => {
               label='Password'
               type='password'
             />
-            <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+            <Button
+              type='submit'
+              colorScheme='whatsapp'
+              isLoading={isSubmitting}
+            >
               Register
             </Button>
           </Stack>

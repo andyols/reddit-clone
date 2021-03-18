@@ -31,7 +31,11 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                 label='Email'
                 type='email'
               />
-              <Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
+              <Button
+                type='submit'
+                colorScheme='whatsapp'
+                isLoading={isSubmitting}
+              >
                 Submit
               </Button>
             </Stack>

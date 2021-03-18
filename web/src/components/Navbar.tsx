@@ -1,8 +1,9 @@
 import { Button, Flex, HStack } from '@chakra-ui/react'
-import NextLink from 'next/link'
+import Link from 'next/link'
 import React from 'react'
 import { useLogoutMutation, useMeQuery } from '../generated/graphql'
 import { isServer } from '../utils/isServer'
+import { SiteLogo } from './SiteLogo'
 
 interface NavbarProps {}
 
@@ -17,42 +18,56 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     // user not logged in
     body = (
       <>
-        <NextLink href='/login'>
-          <Button variant='link' color='gray.100'>
-            login
+        <Link href='/login'>
+          <Button as='a' variant='link' color='gray.100'>
+            Login
           </Button>
-        </NextLink>
-        <NextLink href='/register'>
-          <Button variant='link' color='gray.100'>
-            register
+        </Link>
+        <Link href='/register'>
+          <Button as='a' variant='link' color='gray.100'>
+            Register
           </Button>
-        </NextLink>
+        </Link>
       </>
     )
   } else {
     // user is logged in
     body = (
       <>
-        <Button variant='link' color='gray.100'>
-          {data.me.username}
-        </Button>
+        <Link href='/create-post'>
+          <Button as='a' colorScheme='whatsapp'>
+            Create a Post
+          </Button>
+        </Link>
         <Button
+          as='a'
           variant='link'
-          color='gray.100'
+          color='gray.50'
           onClick={() => logout()}
           isLoading={logoutFetching}
         >
-          logout
+          Logout
         </Button>
       </>
     )
   }
 
   return (
-    <Flex bg='blue.500' p={4} pos='sticky' top={0} zIndex='docked'>
-      <HStack ml='auto' color='gray.100'>
-        {body}
-      </HStack>
+    <Flex
+      as='nav'
+      bg='messenger.600'
+      p={4}
+      pos='sticky'
+      top={0}
+      zIndex='docked'
+      justify='center'
+    >
+      <Flex maxW='4xl' w='full' justify='space-between'>
+        <SiteLogo />
+        <HStack spacing={4} align='center'>
+          {body}
+        </HStack>
+      </Flex>
     </Flex>
   )
 }
