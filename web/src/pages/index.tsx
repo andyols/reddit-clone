@@ -14,6 +14,7 @@ import { Layout } from '@components/Layout'
 import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { useMeQuery, usePostsQuery } from '@generated/graphql'
+import { withApollo } from '@utils/withApollo'
 import Link from 'next/link'
 import React from 'react'
 
@@ -105,4 +106,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default withApollo({ ssr: true })(Index)

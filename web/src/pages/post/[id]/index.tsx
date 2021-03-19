@@ -5,6 +5,7 @@ import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { usePostQuery } from '@generated/graphql'
 import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
+import { withApollo } from '@utils/withApollo'
 import React from 'react'
 
 export const Post = ({}) => {
@@ -40,4 +41,4 @@ export const Post = ({}) => {
   )
 }
 
-export default Post
+export default withApollo({ ssr: true })(Post)

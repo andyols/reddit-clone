@@ -4,6 +4,7 @@ import { Wrapper } from '@components/Wrapper'
 import { useLoginMutation } from '@generated/graphql'
 import { stringOrThis } from '@utils/stringOrThis'
 import { toErrorMap } from '@utils/toErrorMap'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
 import { useRouter } from 'next/dist/client/router'
 import NextLink from 'next/link'
@@ -65,4 +66,4 @@ const Login: React.FC<{}> = ({}) => {
   )
 }
 
-export default Login
+export default withApollo({ ssr: false })(Login)

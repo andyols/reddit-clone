@@ -6,6 +6,7 @@ import { Loader } from '@components/Loader'
 import { TextareaField } from '@components/TextareaField'
 import { usePostQuery, useUpdatePostMutation } from '@generated/graphql'
 import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
 import { useRouter } from 'next/router'
 import React from 'react'
@@ -62,4 +63,4 @@ const EditPost = () => {
   )
 }
 
-export default EditPost
+export default withApollo({ ssr: false })(EditPost)

@@ -11,6 +11,7 @@ dependencies:
   graphql: 15.5.0
   graphql-tag: 2.11.0_graphql@15.5.0
   next: 10.0.9_673d10ab695550cf3e856d21663dfc3f
+  next-apollo: 5.0.4_f439b2177d5ef3e2462056a61909786c
   next-urql: 3.0.0_react@17.0.1+urql@2.0.1
   react: 17.0.1
   react-dom: 17.0.1_react@17.0.1
@@ -4659,6 +4660,20 @@ packages:
     dev: false
     resolution:
       integrity: sha512-6iM8R99ze45ivyH8vybJ7X0yekIcPf5GgLV5K0ENCbmRcaRIDoj37BC8iLEmaaBfqqb8enuZ5p0uhY+lVAbAcA==
+  /next-apollo/5.0.4_f439b2177d5ef3e2462056a61909786c:
+    dependencies:
+      '@apollo/client': 3.3.12_graphql@15.5.0+react@17.0.1
+      graphql: 15.5.0
+      next: 10.0.9_673d10ab695550cf3e856d21663dfc3f
+      react: 17.0.1
+    dev: false
+    peerDependencies:
+      '@apollo/client': ^3.0.0
+      graphql: ^14.0.0 || ^15.0.0
+      next: ^9.3.6 || ^10.0.0
+      react: ^16.8.0 || ^17.0.1
+    resolution:
+      integrity: sha512-nkm8W8XmZiLziFFa7X8FxxbanRx6pRWhkhDIIAprD1A5siSNwZnMPW3GbjwnOoQLyFH8rMHS0SZZ6AAmSWzF9Q==
   /next-urql/3.0.0_react@17.0.1+urql@2.0.1:
     dependencies:
       react: 17.0.1
@@ -6430,6 +6445,7 @@ specifiers:
   graphql: ^15.5.0
   graphql-tag: ^2.11.0
   next: latest
+  next-apollo: ^5.0.4
   next-urql: ^3.0.0
   react: ^17.0.1
   react-dom: ^17.0.1

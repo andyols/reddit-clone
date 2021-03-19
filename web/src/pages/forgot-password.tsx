@@ -2,6 +2,7 @@ import { Button, Stack, Text } from '@chakra-ui/react'
 import { InputField } from '@components/InputField'
 import { Wrapper } from '@components/Wrapper'
 import { useForgotPasswordMutation } from '@generated/graphql'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
 import React, { useState } from 'react'
 
@@ -44,4 +45,4 @@ const ForgotPassword: React.FC<{}> = ({}) => {
   )
 }
 
-export default ForgotPassword
+export default withApollo({ ssr: false })(ForgotPassword)

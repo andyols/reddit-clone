@@ -4,6 +4,7 @@ import { Wrapper } from '@components/Wrapper'
 import { useChangePasswordMutation } from '@generated/graphql'
 import { stringOrThis } from '@utils/stringOrThis'
 import { toErrorMap } from '@utils/toErrorMap'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
 import { NextPage } from 'next'
 import { useRouter } from 'next/dist/client/router'
@@ -75,4 +76,4 @@ const ChangePassword: NextPage = () => {
   )
 }
 
-export default ChangePassword
+export default withApollo({ ssr: false })(ChangePassword)

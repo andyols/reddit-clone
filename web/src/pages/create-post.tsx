@@ -4,6 +4,7 @@ import { Layout } from '@components/Layout'
 import { TextareaField } from '@components/TextareaField'
 import { useCreatePostMutation } from '@generated/graphql'
 import { useAuthRedirect } from '@utils/useAuthRedirect'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
 import { useRouter } from 'next/dist/client/router'
 import React from 'react'
@@ -47,4 +48,4 @@ const CreatePost: React.FC<{}> = ({}) => {
   )
 }
 
-export default CreatePost
+export default withApollo({ ssr: false })(CreatePost)
