@@ -15,15 +15,15 @@ import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { useMeQuery, usePostsQuery } from '@generated/graphql'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 10,
-    cursor: null as string | null
-  })
-  const { data, error, loading } = usePostsQuery({
-    variables
+  const { data, error, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 10,
+      cursor: null
+    },
+    notifyOnNetworkStatusChange: true
   })
   const { data: meData } = useMeQuery()
 
@@ -88,9 +88,12 @@ const Index = () => {
             my={8}
             isDisabled={!data.posts.hasMore}
             onClick={() => {
-              setVariables({
-                limit: variables.limit,
-                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor:
+                    data.posts.posts[data.posts.posts.length - 1].createdAt
+                }
               })
             }}
           >
