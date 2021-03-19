@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 
 export const useAuthRedirect = () => {
   const router = useRouter()
-  const [{ data, fetching }] = useMeQuery()
+  const { data, loading } = useMeQuery()
 
   useEffect(() => {
-    if (!data?.me && !fetching) {
+    if (!data?.me && !loading) {
       router.replace(`/login?next=${router.pathname}`)
     }
-  }, [data, fetching, router])
+  }, [data, loading, router])
 }

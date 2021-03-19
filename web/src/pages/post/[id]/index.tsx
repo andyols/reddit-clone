@@ -4,27 +4,25 @@ import { Layout } from '@components/Layout'
 import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { usePostQuery } from '@generated/graphql'
-import { createUrqlClient } from '@utils/createUrqlClient'
 import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
-import { withUrqlClient } from 'next-urql'
 import React from 'react'
 
 export const Post = ({}) => {
   const id = usePostIdFromUrl()
-  const [{ data, error, fetching }] = usePostQuery({
-    pause: id === -1, // bad url param, dont bother with request
+  const { data, error, loading } = usePostQuery({
+    skip: id === -1, // bad url param, dont bother with request
     variables: {
       id
     }
   })
 
   // post query failed for some reason
-  if (!fetching && error) {
+  if (!loading && error) {
     return <ErrorAlert message={error.message} />
   }
 
   // post data has not been resolved yet
-  if (fetching || !data?.post) {
+  if (loading || !data?.post) {
     return <Loader />
   }
 
@@ -42,4 +40,4 @@ export const Post = ({}) => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post)
+export default Post
