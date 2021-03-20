@@ -3,15 +3,14 @@ import { InputField } from '@components/InputField'
 import { Layout } from '@components/Layout'
 import { TextareaField } from '@components/TextareaField'
 import { useCreatePostMutation } from '@generated/graphql'
-import { createUrqlClient } from '@utils/createUrqlClient'
 import { useAuthRedirect } from '@utils/useAuthRedirect'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
-import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/dist/client/router'
 import React from 'react'
 
 const CreatePost: React.FC<{}> = ({}) => {
-  const [, createPost] = useCreatePostMutation()
+  const [createPost] = useCreatePostMutation()
   const router = useRouter()
   useAuthRedirect()
 
@@ -20,9 +19,14 @@ const CreatePost: React.FC<{}> = ({}) => {
       <Formik
         initialValues={{ title: '', text: '' }}
         onSubmit={async (values) => {
-          const { error } = await createPost({ input: values })
+          const { errors } = await createPost({
+            variables: { input: values },
+            update: (cache) => {
+              cache.evict({ fieldName: 'posts' })
+            }
+          })
 
-          if (!error) {
+          if (!errors) {
             router.push('/')
           }
         }}
@@ -49,4 +53,4 @@ const CreatePost: React.FC<{}> = ({}) => {
   )
 }
 
-export default withUrqlClient(createUrqlClient)(CreatePost)
+export default withApollo({ ssr: false })(CreatePost)

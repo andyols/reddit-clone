@@ -1,20 +1,20 @@
+import { useApolloClient } from '@apollo/client'
 import { Button, Flex, HStack } from '@chakra-ui/react'
 import { useLogoutMutation, useMeQuery } from '@generated/graphql'
 import { isServer } from '@utils/isServer'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
 import { SiteLogo } from './SiteLogo'
 
 interface NavbarProps {}
 
 export const Navbar: React.FC<NavbarProps> = ({}) => {
-  const router = useRouter()
-  const [{ data, fetching }] = useMeQuery({ pause: isServer() })
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation()
+  const { data, loading } = useMeQuery({ skip: isServer() })
+  const [logout, { loading: logoutLoading }] = useLogoutMutation()
+  const apollo = useApolloClient()
 
   let body = null
-  if (fetching) {
+  if (loading) {
     // user data loading
   } else if (!data?.me) {
     // user not logged in
@@ -45,9 +45,9 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
           color='gray.50'
           onClick={async () => {
             await logout()
-            router.reload()
+            await apollo.resetStore()
           }}
-          isLoading={logoutFetching}
+          isLoading={logoutLoading}
         >
           Logout
         </Button>

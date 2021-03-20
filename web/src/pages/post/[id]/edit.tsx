@@ -5,31 +5,30 @@ import { Layout } from '@components/Layout'
 import { Loader } from '@components/Loader'
 import { TextareaField } from '@components/TextareaField'
 import { usePostQuery, useUpdatePostMutation } from '@generated/graphql'
-import { createUrqlClient } from '@utils/createUrqlClient'
 import { usePostIdFromUrl } from '@utils/usePostIdFromUrl'
+import { withApollo } from '@utils/withApollo'
 import { Form, Formik } from 'formik'
-import { withUrqlClient } from 'next-urql'
 import { useRouter } from 'next/router'
 import React from 'react'
 
 const EditPost = () => {
   const router = useRouter()
   const id = usePostIdFromUrl()
-  const [{ data, error, fetching }] = usePostQuery({
-    pause: id === -1, // bad url param, dont bother with request
+  const { data, error, loading } = usePostQuery({
+    skip: id === -1, // bad url param, dont bother with request
     variables: {
       id
     }
   })
-  const [, updatePost] = useUpdatePostMutation()
+  const [updatePost] = useUpdatePostMutation()
 
   // post query failed for some reason
-  if (error && !fetching) {
+  if (error && !loading) {
     return <ErrorAlert message={error.message} />
   }
 
   // post data has not been resolved yet
-  if (fetching || !data?.post) {
+  if (loading || !data?.post) {
     return <Loader />
   }
 
@@ -38,7 +37,7 @@ const EditPost = () => {
       <Formik
         initialValues={{ title: data.post.title, text: data.post.text }}
         onSubmit={async (values) => {
-          await updatePost({ id, ...values })
+          await updatePost({ variables: { id, ...values } })
           router.back()
         }}
       >
@@ -64,4 +63,4 @@ const EditPost = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient)(EditPost)
+export default withApollo({ ssr: false })(EditPost)

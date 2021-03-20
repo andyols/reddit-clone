@@ -1,14 +1,56 @@
+import { ApolloCache } from '@apollo/client'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { IconButton, Stack, Text } from '@chakra-ui/react'
-import { PostSnippetFragment, useDootMutation } from '@generated/graphql'
+import {
+  DootMutation,
+  PostSnippetFragment,
+  useDootMutation
+} from '@generated/graphql'
+import gql from 'graphql-tag'
 import React, { useState } from 'react'
 
 interface DootSection {
   post: PostSnippetFragment
 }
 
+const updateAfterDoot = (
+  value: number,
+  postId: number,
+  cache: ApolloCache<DootMutation>
+) => {
+  const data = cache.readFragment<{
+    id: number
+    points: number
+    dootStatus: number | null
+  }>({
+    id: `Post:${postId}`,
+    fragment: gql`
+      fragment _ on Post {
+        id
+        points
+        dootStatus
+      }
+    `
+  })
+  if (data) {
+    if (data.dootStatus === value) return
+    const newPoints =
+      (data.points as number) + (!data.dootStatus ? 1 : 2) * value
+    cache.writeFragment({
+      id: `Post:${postId}`,
+      fragment: gql`
+        fragment _ on Post {
+          points
+          dootStatus
+        }
+      `,
+      data: { points: newPoints, dootStatus: value }
+    })
+  }
+}
+
 export const DootSection: React.FC<DootSection> = ({ post }) => {
-  const [, doot] = useDootMutation()
+  const [doot] = useDootMutation()
   const [loading, setLoading] = useState<'updoot' | 'downdoot' | 'not'>('not')
 
   return (
@@ -25,8 +67,11 @@ export const DootSection: React.FC<DootSection> = ({ post }) => {
           if (post.dootStatus === 1) return
           setLoading('updoot')
           await doot({
-            postId: post.id,
-            value: 1
+            variables: {
+              postId: post.id,
+              value: 1
+            },
+            update: (cache) => updateAfterDoot(1, post.id, cache)
           })
           setLoading('not')
         }}
@@ -47,8 +92,11 @@ export const DootSection: React.FC<DootSection> = ({ post }) => {
           if (post.dootStatus === -1) return
           setLoading('downdoot')
           await doot({
-            postId: post.id,
-            value: -1
+            variables: {
+              postId: post.id,
+              value: -1
+            },
+            update: (cache) => updateAfterDoot(-1, post.id, cache)
           })
           setLoading('not')
         }}

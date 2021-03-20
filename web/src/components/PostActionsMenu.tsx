@@ -16,7 +16,7 @@ interface PostActionsMenuProps {
 }
 
 export const PostActionsMenu: React.FC<PostActionsMenuProps> = ({ id }) => {
-  const [, deletePost] = useDeletePostMutation()
+  const [deletePost] = useDeletePostMutation()
 
   return (
     <Menu placement='left-start'>
@@ -47,7 +47,14 @@ export const PostActionsMenu: React.FC<PostActionsMenuProps> = ({ id }) => {
               color: 'red.500',
               bg: 'gray.100'
             }}
-            onClick={() => deletePost({ id })}
+            onClick={() =>
+              deletePost({
+                variables: { id },
+                update: (cache) => {
+                  cache.evict({ id: `Post:${id}` })
+                }
+              })
+            }
           >
             <Icon as={FiTrash} mr={2} />
             Delete Post

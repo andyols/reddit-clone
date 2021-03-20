@@ -14,28 +14,27 @@ import { Layout } from '@components/Layout'
 import { Loader } from '@components/Loader'
 import { PostActionsMenu } from '@components/PostActionsMenu'
 import { useMeQuery, usePostsQuery } from '@generated/graphql'
-import { createUrqlClient } from '@utils/createUrqlClient'
-import { withUrqlClient } from 'next-urql'
+import { withApollo } from '@utils/withApollo'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
 
 const Index = () => {
-  const [variables, setVariables] = useState({
-    limit: 10,
-    cursor: null as string | null
+  const { data, error, loading, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 10,
+      cursor: null
+    },
+    notifyOnNetworkStatusChange: true
   })
-  const [{ data, error, fetching }] = usePostsQuery({
-    variables
-  })
-  const [{ data: meData }] = useMeQuery()
+  const { data: meData } = useMeQuery()
 
-  // post query failed for some reason
-  if (error && !fetching) {
-    return <ErrorAlert message={error.message} />
+  // query failed for some reason
+  if (!data && !loading) {
+    return <ErrorAlert message={error?.message} />
   }
 
-  // post data has not been resolved yet
-  if (fetching || !data?.posts) {
+  // data has not been resolved yet
+  if (!data && loading) {
     return <Loader />
   }
 
@@ -46,7 +45,7 @@ const Index = () => {
         <Divider mb={4} />
       </Stack>
       <Stack spacing={4} as='section'>
-        {data.posts.posts.map((p) =>
+        {data!.posts.posts.map((p) =>
           !p ? null : (
             <HStack
               as='article'
@@ -85,14 +84,17 @@ const Index = () => {
         <Flex>
           <Button
             colorScheme='blue'
-            isLoading={fetching}
+            isLoading={loading}
             m='auto'
             my={8}
             isDisabled={!data.posts.hasMore}
             onClick={() => {
-              setVariables({
-                limit: variables.limit,
-                cursor: data.posts.posts[data.posts.posts.length - 1].createdAt
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  cursor:
+                    data.posts.posts[data.posts.posts.length - 1].createdAt
+                }
               })
             }}
           >
@@ -104,4 +106,4 @@ const Index = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index)
+export default withApollo({ ssr: true })(Index)
