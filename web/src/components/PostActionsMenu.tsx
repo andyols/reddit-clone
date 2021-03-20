@@ -47,7 +47,14 @@ export const PostActionsMenu: React.FC<PostActionsMenuProps> = ({ id }) => {
               color: 'red.500',
               bg: 'gray.100'
             }}
-            onClick={() => deletePost({ variables: { id } })}
+            onClick={() =>
+              deletePost({
+                variables: { id },
+                update: (cache) => {
+                  cache.evict({ id: `Post:${id}` })
+                }
+              })
+            }
           >
             <Icon as={FiTrash} mr={2} />
             Delete Post

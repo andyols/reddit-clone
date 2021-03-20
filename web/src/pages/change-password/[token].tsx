@@ -1,7 +1,11 @@
 import { Button, Stack } from '@chakra-ui/react'
 import { InputField } from '@components/InputField'
 import { Wrapper } from '@components/Wrapper'
-import { useChangePasswordMutation } from '@generated/graphql'
+import {
+  MeDocument,
+  MeQuery,
+  useChangePasswordMutation
+} from '@generated/graphql'
 import { stringOrThis } from '@utils/stringOrThis'
 import { toErrorMap } from '@utils/toErrorMap'
 import { withApollo } from '@utils/withApollo'
@@ -25,6 +29,16 @@ const ChangePassword: NextPage = () => {
             variables: {
               newPassword: values.newPassword,
               token: stringOrThis(router.query.token, '')
+            },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: 'Query',
+                  me: data?.changePassword.user
+                }
+              })
+              cache.evict({ fieldName: 'posts:{}' })
             }
           })
           if (response.data?.changePassword.errors) {
